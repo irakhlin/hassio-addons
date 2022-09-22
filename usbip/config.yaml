@@ -10,7 +10,7 @@ arch:
   - armhf
   - armv7
   - i386
-image: irakhlin/hassio-usbip-{arch}
+image: irakhlin/usbip-addon-{arch}
 ports:
   22/tcp: 22333
 ports_description:
