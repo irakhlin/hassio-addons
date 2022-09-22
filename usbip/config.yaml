@@ -1,6 +1,6 @@
 ---
 name: usbip client
-version: 0.2.0
+version: 0.3.0
 slug: usbipclient
 description: USBIP Client Addon for Home Assistant
 url: https://github.com/irakhlin/usbip-hassio/tree/main/usbip
@@ -12,7 +12,7 @@ arch:
   - i386
 image: irakhlin/usbip-addon-{arch}
 ports:
-  22/tcp: 22333
+  22/tcp: 22
 ports_description:
   22/tcp: SSH Interface
 usb: true
