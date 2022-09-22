@@ -1,6 +1,6 @@
 ---
 name: usbip client
-version: 0.1.0
+version: 0.2.0
 slug: usbipclient
 description: USBIP Client Addon for Home Assistant
 url: https://github.com/irakhlin/usbip-hassio/tree/main/usbip
@@ -10,7 +10,7 @@ arch:
   - armhf
   - armv7
   - i386
-image: irakhlin/usbip-addon-{arch}
+image: irakhlin/hassio-usbip-{arch}
 ports:
   22/tcp: 22333
 ports_description:
@@ -18,7 +18,6 @@ ports_description:
 usb: true
 tmpfs: true
 kernel_modules: true
-devicetree: true
 init: false
 privileged:
   - NET_ADMIN
@@ -26,18 +25,37 @@ privileged:
   - SYS_RESOURCE
   - SYS_MODULE
   - DAC_READ_SEARCH
-options:
-  authorized_keys: []
-  password: ""
-  apks: []
-  server:
-    tcp_forwarding: false
-schema:
-  authorized_keys:
-    - str
-  password: password
-  apks:
-    - str
-  server:
-    tcp_forwarding: bool
+codenotary: i.rakhlin@gmail.com
 startup: services
+options:
+  ssh:
+    username: hassio
+    password: ""
+    authorized_keys: []
+    sftp: false
+    compatibility_mode: false
+    allow_agent_forwarding: false
+    allow_remote_port_forwarding: false
+    allow_tcp_forwarding: false
+  zsh: true
+  share_sessions: false
+  packages: []
+  init_commands: []
+schema:
+  log_level: list(trace|debug|info|notice|warning|error|fatal)?
+  ssh:
+    username: str
+    password: password
+    authorized_keys:
+      - str
+    sftp: bool
+    compatibility_mode: bool
+    allow_agent_forwarding: bool
+    allow_remote_port_forwarding: bool
+    allow_tcp_forwarding: bool
+  zsh: bool
+  share_sessions: bool
+  packages:
+    - str
+  init_commands:
+    - str
