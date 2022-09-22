@@ -1,9 +1,9 @@
 ---
 name: usbip
-version: 0.0.2
+version: 0.1
 slug: usbipclient
 description: USBIP Gateway
-url: https://github.com/irakhlin/usbip-hassio/tree/main/usbip
+url: https://github.com/irakhlin/hassio-addons/tree/main/usbip
 arch:
   - amd64
   - aarch64
