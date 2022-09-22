@@ -1,30 +1,43 @@
 ---
-name: usbip
-version: 0.1
+name: usbip client
+version: 0.1.0
 slug: usbipclient
-description: USBIP Gateway
-url: https://github.com/irakhlin/hassio-addons/tree/main/usbip
+description: USBIP Client Addon for Home Assistant
+url: https://github.com/irakhlin/usbip-hassio/tree/main/usbip
 arch:
   - amd64
   - aarch64
-image: irakhlin/image-{arch}-usbip
+  - armhf
+  - armv7
+  - i386
+image: irakhlin/usbip-addon-{arch}
 ports:
-  22333/tcp: 22333
+  22/tcp: 22333
 ports_description:
-  22333/tcp: SSH Interface
-startup: application
-full_access: true
-init: true
-options: {}
-schema: {}
+  22/tcp: SSH Interface
 usb: true
 tmpfs: true
-host_network: false
 kernel_modules: true
 devicetree: true
+init: false
 privileged:
   - NET_ADMIN
   - SYS_ADMIN
   - SYS_RESOURCE
   - SYS_MODULE
   - DAC_READ_SEARCH
+options:
+  authorized_keys: []
+  password: ""
+  apks: []
+  server:
+    tcp_forwarding: false
+schema:
+  authorized_keys:
+    - str
+  password: password
+  apks:
+    - str
+  server:
+    tcp_forwarding: bool
+startup: services
