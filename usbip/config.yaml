@@ -1,0 +1,30 @@
+---
+name: usbip
+version: 0.0.2
+slug: usbipclient
+description: USBIP Gateway
+url: https://github.com/irakhlin/usbip-hassio/tree/main/usbip
+arch:
+  - amd64
+  - aarch64
+image: irakhlin/image-{arch}-usbip
+ports:
+  22333/tcp: 22333
+ports_description:
+  22333/tcp: SSH Interface
+startup: application
+full_access: true
+init: true
+options: {}
+schema: {}
+usb: true
+tmpfs: true
+host_network: false
+kernel_modules: true
+devicetree: true
+privileged:
+  - NET_ADMIN
+  - SYS_ADMIN
+  - SYS_RESOURCE
+  - SYS_MODULE
+  - DAC_READ_SEARCH
