@@ -25,7 +25,6 @@ privileged:
   - SYS_RESOURCE
   - SYS_MODULE
   - DAC_READ_SEARCH
-codenotary: i.rakhlin@gmail.com
 startup: services
 options:
   ssh:
