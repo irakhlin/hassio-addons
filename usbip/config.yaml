@@ -18,7 +18,6 @@ ports_description:
 usb: true
 tmpfs: true
 kernel_modules: true
-devicetree: true
 init: false
 usbip: true
 privileged:
