@@ -1,6 +1,6 @@
 ---
 name: usbip client
-version: 0.3.4
+version: 0.3.3
 slug: usbipclient
 description: USBIP Client Addon for Home Assistant
 url: https://github.com/irakhlin/usbip-hassio/tree/main/usbip
