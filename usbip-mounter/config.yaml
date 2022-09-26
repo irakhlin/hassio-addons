@@ -16,6 +16,12 @@ arch:
 - armhf
 - armv7
 - i386
+privileged:
+  - SYS_ADMIN
+  - SYS_RAWIO
+  - SYS_NICE
+devices:
+  - /dev/mem
 schema:
   devices:
     - server_address: match(^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)
