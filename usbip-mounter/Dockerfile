@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:13.2.2
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:14.1.0
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
@@ -6,10 +6,10 @@ FROM ${BUILD_FROM}
 ARG BUILD_ARCH=amd64
 # hadolint ignore=DL3003,DL3042
 RUN apk add --no-cache \
-    kmod=30-r1 \
-    linux-tools-usbip=5.15.74-r0 \
-    hwdata=0.364-r0 \
-    device-mapper-libs=2.03.17-r1
+    kmod=30-r3 \
+    linux-tools-usbip=6.3.12-r0 \
+    hwdata-usb=0.370-r0 \
+    device-mapper-libs=2.03.21-r3
 
 # Copy root filesystem
 COPY rootfs /
