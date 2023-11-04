@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1.4
 ARG BUILD_FROM
 
-FROM irakhlin/double-take:latest
+FROM irakhlin/double-take:1.4.1
 
 ARG S6_OVERLAY_VERSION=3.1.5.0
 ARG BUILD_ARCH=amd64
