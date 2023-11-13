@@ -1,0 +1,30 @@
+name: "Test"
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Test build
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          target: ['ai.server']
+        fail-fast: false
+    steps:
+      - name: Free disk space
+        if: matrix.target == 'ai.server'
+        run: |
+          curl -L -k https://raw.githubusercontent.com/apache/flink/master/tools/azure-pipelines/free_disk_space.sh | bash
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Test build
+        uses: home-assistant/builder@master
+        with:
+          args: |
+            --test \
+            --amd64 \
+            --aarch64 \
+            --no-latest \
+            -i hassio-addon-${{ matrix.target }}-{arch} \
+            --target ${{ matrix.target }} \
+            --docker-hub ${{ secrets.DOCKER_USERNAME }}
