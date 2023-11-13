@@ -1,5 +1,5 @@
 name: Double Take
-version: 1.14.1
+version: 1.14.2
 image: ghcr.io/irakhlin/hassio-addon-double-take-{arch}
 url: https://double-take.site/redirect.php?location=github
 panel_icon: mdi:face-recognition
