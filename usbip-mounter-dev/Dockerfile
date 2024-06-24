@@ -9,7 +9,8 @@ RUN apk add --no-cache \
     kmod \
     linux-tools-usbip \
     hwdata-usb \
-    device-mapper-libs
+    device-mapper-libs \
+    grep
 
 # Copy root filesystem
 COPY rootfs /
