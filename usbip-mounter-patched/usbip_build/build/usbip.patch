@@ -1,14 +1,27 @@
---- a/tools/usb/usbip/src/usbip_network.c
-+++ b/tools/usb/usbip/src/usbip_network.c
-@@ -231,15 +231,53 @@
+diff -Nurp linux-6.13/tools/usb/usbip/src/usbip_attach.c linux-6.13-patch/tools/usb/usbip/src/usbip_attach.c
+--- a/tools/usb/usbip/src/usbip_attach.c	2025-01-19 23:51:45.000000000 +0000
++++ b/tools/usb/usbip/src/usbip_attach.c	2025-02-14 20:38:04.372162773 +0000
+@@ -177,7 +177,7 @@ static int attach_device(char *host, cha
+ 	int rc;
+ 	int rhport;
+ 
+-	sockfd = usbip_net_tcp_connect(host, usbip_port_string);
++	sockfd = usbip_net_tcp_connect_attach(host, usbip_port_string);
+ 	if (sockfd < 0) {
+ 		err("tcp connect");
+ 		return -1;
+diff -Nurp linux-6.13/tools/usb/usbip/src/usbip_network.c linux-6.13-patch/tools/usb/usbip/src/usbip_network.c
+--- a/tools/usb/usbip/src/usbip_network.c	2025-01-19 23:51:45.000000000 +0000
++++ b/tools/usb/usbip/src/usbip_network.c	2025-02-14 20:37:20.497488751 +0000
+@@ -231,14 +231,51 @@ int usbip_net_set_nodelay(int sockfd)
  	return ret;
  }
  
 -int usbip_net_set_keepalive(int sockfd)
-+
 +int usbip_net_set_timeout(int sockfd, int timeout)
  {
-+	int ret;
+-	const int val = 1;
+ 	int ret;
 +	struct timeval tv;
 +
 +	tv.tv_sec = timeout;
@@ -17,32 +30,33 @@
 +	ret = setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 +	if (ret < 0)
 +		err("setsockopt SO_SNDTIMEO");
-+
+ 
+-	ret = setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val));
 +	ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-+	if (ret < 0)
-+		err("setsockopt SO_RCVTIMEO");
+ 	if (ret < 0)
+-		dbg("setsockopt: SO_KEEPALIVE");
++    err("setsockopt SO_RCVTIMEO");
 +
-+	return ret;
++return ret;
 +}
 +
 +int usbip_net_set_keepalive(int sockfd, int keepcnt)
 +{
- 	const int val = 1;
++ 	const int val = 1;
 +	const int keepidle = 1;
 +	const int keepintvl = 1;
- 	int ret;
- 
++ 	int ret;
++ 
 +	/* Enable keepalive */
- 	ret = setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val));
- 	if (ret < 0)
--		dbg("setsockopt: SO_KEEPALIVE");
-+		err("setsockopt SO_KEEPALIVE");
++ 	ret = setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val));
++ 	if (ret < 0)
++ 		err("setsockopt SO_KEEPALIVE");
 +	
 +	/* Start sending keepalives after 1s of inactivity */
 +	ret = setsockopt(sockfd, SOL_TCP, TCP_KEEPIDLE, &keepidle, sizeof(keepidle));
 +	if (ret < 0)
 +		err("setsockopt TCP_KEEPIDLE");
- 
++ 
 +	/* Continue sending in 1s intervals */
 +	ret = setsockopt(sockfd, SOL_TCP, TCP_KEEPINTVL, &keepintvl, sizeof(keepintvl));
 +	if (ret < 0)
@@ -52,22 +66,58 @@
 +	ret = setsockopt(sockfd, SOL_TCP, TCP_KEEPCNT, &keepcnt, sizeof(keepcnt));
 +	if (ret < 0)
 +		err("setsockopt TCP_KEEPCNT");
-+
+ 
  	return ret;
  }
+@@ -285,8 +322,54 @@ int usbip_net_tcp_connect(char *hostname
  
-@@ -260,6 +298,8 @@
-  */
- int usbip_net_tcp_connect(char *hostname, char *service)
- {
-+	const int timeout = 10;
-+	const int keepcnt = 5;	
- 	struct addrinfo hints, *res, *rp;
- 	int sockfd;
- 	int ret;
-@@ -286,7 +326,8 @@
  		/* should set TCP_NODELAY for usbip */
  		usbip_net_set_nodelay(sockfd);
++
++		if (connect(sockfd, rp->ai_addr, rp->ai_addrlen) == 0)
++			break;
++
++		close(sockfd);
++	}
++
++	freeaddrinfo(res);
++
++	if (!rp)
++		return EAI_SYSTEM;
++
++	return sockfd;
++}
++
++int usbip_net_tcp_connect_attach(char *hostname, char *service)
++{
++	const int timeout = 10;
++	const int keepcnt = 3;
++
++	struct addrinfo hints, *res, *rp;
++	int sockfd;
++	int ret;
++
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = AF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;
++
++	/* get all possible addresses */
++	ret = getaddrinfo(hostname, service, &hints, &res);
++	if (ret < 0) {
++		dbg("getaddrinfo: %s service %s: %s", hostname, service,
++		    gai_strerror(ret));
++		return ret;
++	}
++
++	/* try the addresses */
++	for (rp = res; rp; rp = rp->ai_next) {
++		sockfd = socket(rp->ai_family, rp->ai_socktype,
++				rp->ai_protocol);
++		if (sockfd < 0)
++			continue;
++
++		/* should set TCP_NODELAY for usbip */
++		usbip_net_set_nodelay(sockfd);
  		/* TODO: write code for heartbeat */
 -		usbip_net_set_keepalive(sockfd);
 +		usbip_net_set_keepalive(sockfd, keepcnt);
@@ -75,15 +125,18 @@
  
  		if (connect(sockfd, rp->ai_addr, rp->ai_addrlen) == 0)
  			break;
---- a/tools/usb/usbip/src/usbip_network.h
-+++ b/tools/usb/usbip/src/usbip_network.h
-@@ -171,7 +171,8 @@
+diff -Nurp linux-6.13/tools/usb/usbip/src/usbip_network.h linux-6.13-patch/tools/usb/usbip/src/usbip_network.h
+--- a/tools/usb/usbip/src/usbip_network.h	2025-01-19 23:51:45.000000000 +0000
++++ b/tools/usb/usbip/src/usbip_network.h	2025-02-14 20:36:10.523889690 +0000
+@@ -171,8 +171,9 @@ int usbip_net_send_op_common(int sockfd,
  int usbip_net_recv_op_common(int sockfd, uint16_t *code, int *status);
  int usbip_net_set_reuseaddr(int sockfd);
  int usbip_net_set_nodelay(int sockfd);
 -int usbip_net_set_keepalive(int sockfd);
-+int usbip_net_set_keepalive(int sockfd, int keepcnt);
-+int usbip_net_set_timeout(int sockfd, int timeout);
  int usbip_net_set_v6only(int sockfd);
  int usbip_net_tcp_connect(char *hostname, char *port);
- 
+-
++int usbip_net_tcp_connect_attach(char *hostname, char *port);
++int usbip_net_set_timeout(int sockfd, int timeout);
++int usbip_net_set_keepalive(int sockfd, int keepcnt);
+ #endif /* __USBIP_NETWORK_H */
