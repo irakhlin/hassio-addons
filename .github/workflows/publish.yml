@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-          target: ['double-take']
+          target: ['usbip-mounter', 'usbip-mounter-dev', 'usbip-mounter-patched']
         fail-fast: false
     steps:
       - name: Checkout the repository
