@@ -15,7 +15,9 @@ RUN mkdir -p /etc/apk/keys && cp /irakhlin.rsa.pub /etc/apk/keys/ \
 
 WORKDIR /build
 
-RUN abuild -rfFkK
+RUN abuild -rfFkK && \
+  mv /root/packages/x86_64 /root/packages/output || echo 'not found' && \
+  mv /root/packages/aarch64 /root/packages/output || echo 'not found'
 
 
 ARG BUILD_FROM=ghcr.io/hassio-addons/base:19.0.0
@@ -25,12 +27,11 @@ FROM ${BUILD_FROM} AS final
 # Setup base
 ARG BUILD_ARCH=amd64
 
-COPY --from=build-stage /root/packages/x86_64/linux-tools-usbip-6.15.0-r0.apk /tmp/linux-tools-usbip-6.15.0-r0.apk
+COPY --from=build-stage /root/packages/output/linux-tools-usbip-6.15.0-r0.apk /tmp/linux-tools-usbip-6.15.0-r0.apk
 
 # hadolint ignore=DL3003,DL3042
 RUN apk add --no-cache \
     kmod \
-#    linux-tools-usbip \
     hwdata-usb \
     device-mapper-libs \
     grep
