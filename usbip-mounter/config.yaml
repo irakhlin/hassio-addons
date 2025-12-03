@@ -1,5 +1,5 @@
-name: USBIP Mounter Dev
-slug: usbip-dev
+name: USBIP Mounter
+slug: usbip-mounter
 startup: services
 url: https://github.com/irakhlin/hassio-usbip-mounter
 panel_icon: mdi:usb
@@ -8,7 +8,7 @@ usb: true
 kernel_modules: true
 host_network: true
 apparmor: false
-version: 1.5.0-dev
+version: 1.5.0
 description: USBIP Client Handler to attach USBIP devices to Hassio Dev Build
 init: false
 full_access: true

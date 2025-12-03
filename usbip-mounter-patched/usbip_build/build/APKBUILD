@@ -1,8 +1,10 @@
 # Contributor: Leo <thinkabit.ukim@gmail.com>
 # Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
-# Maintainer: Milan P. Stanić <mps@arvanta.net>
+# Contributor: Milan P. Stanić <mps@arvanta.net>
+maintainer="Achill Gilgenast <achill@achill.org>"
 pkgname=linux-tools
-pkgver=6.13.2
+pkgver=6.18.0
+# NOTE: Follows Greg's stable Linux releases, see kernel.org
 _kernver=${pkgver%.*}
 pkgrel=0
 pkgdesc="Linux kernel tools meta package"
@@ -11,7 +13,7 @@ arch="all"
 license="GPL-2.0-only"
 depends="perf cpupower $pkgname-gpio $pkgname-iio"
 depends_dev="pciutils-dev readline-dev gettext-dev"
-_llvmver=18
+_llvmver=21
 makedepends="
 	$depends_dev
 	asciidoc
@@ -51,6 +53,7 @@ subpackages="
 	perf-bash-completion:perf_bashcomp:noarch
 	cpupower
 	cpupower-openrc:cpupower_openrc
+	cpupower-systemd:cpupower_systemd
 	cpupower-bash-completion:cpupower_bashcomp:noarch
 	$pkgname-dev
 	$pkgname-gpio
@@ -88,11 +91,6 @@ esac
 
 builddir="$srcdir"/linux-$_kernver
 
-do_sign() {
-
-echo "hello"
-
-}
 prepare() {
 	# tools/perf/Makefile is just a wrapper around tools/perf/Makefile.perf
 	# which calls the latter with a -j make(1) option set. However, it discards
@@ -112,6 +110,7 @@ _make_tools() {
 }
 
 build() {
+	export PATH="$PATH:/usr/lib/llvm$_llvmver/bin"
 	_make_tools perf cpupower gpio iio spi tmon bpf/bpftool
 	(
 		cd tools/usb/usbip
@@ -166,6 +165,7 @@ cpupower() {
 	amove \
 		usr/bin/cpu* \
 		usr/sbin/cpu* \
+		usr/libexec/cpu* \
 		usr/lib/libcpu*.so.* \
 		etc/cpu*
 
@@ -184,6 +184,14 @@ cpupower_openrc() {
 	amove \
 		etc/init.d/cpupower \
 		etc/conf.d/cpupower
+}
+
+cpupower_systemd() {
+	pkgdesc="Linux kernel tool to set CPU power features (systemd files)"
+	depends=""
+	install_if="cpupower=$pkgver-r$pkgrel systemd"
+
+	amove usr/lib/systemd/system/cpupower.service
 }
 
 cpupower_bashcomp() {
@@ -287,7 +295,7 @@ doc() {
 }
 
 sha512sums="
-1137e6440132b0958f89165440e99208f82b204e7245ae69dc9c808df97d13ce8f58136db92407e0e93394fa7f6283ec7a34597c6e92a5b6d9025e0960357957  linux-6.13.tar.xz
+88599ffdec96d150c1feb9b261ba93bb0301a9d0e1ad6bef7aeab1f5372cbfc57d8b43c7e902bd8f76921d1dbd8189663c142ea869e51d0e2b483b150ee00fe0  linux-6.18.tar.xz
 a46e3a84b00a39a356618831d0ddfb7f0d10f0a3799d1307ba2cc832e73c01f8d637a4e801a6dd25025f6f13155c6ad8b836422ff72d365e51063ac0bf907f52  cpupower-libs.patch
 0657b461659e79c1926379aab30e7b7ab2d59eaf3e686f1dce468b79eb1320c188c14a0507361660abd2553bccffa9e149fa5b6e4d770d10c99bf5dafd2e05ee  dt_lnk.patch
 2092b96d64e6c379ae52700b3c1bf459581afea69622a296821381e74ecafa4a08cea24eab002ad2152878a4508918de7807ac98ba72faf2d4dea18cc275933f  perf-doc.patch
@@ -298,5 +306,4 @@ ea04b71c828df423e55ce22058015fe3cf13f58a1adbddefa61a8df26b343d22596d16737c592ead
 9da491950659d124afe968fafdd063eb520582fb42fd4fe62e4b87bd04cfd3f134058b632a2f80489597863c5ab94cef101c709eb168152be78e7cde726f83cb  usbip.patch
 fcbd64d844c9bc187d08cef5995e91a46c0df78deb24e96ac9210c0e2c730eca0301970d9b8ffbf003df274682d05072431a26b59d8c491f396618268a12ec92  usbip.initd
 eb8de617e27c4d5fdfee9c442e8f74b0afb4d0fe7b59eca3a19629eb70fea7e09b3c125bc968aa8810d845ce661c829bd0f3fdb2288664f2cccf423bc0ae6ae8  usbip.confd
-5e3c06a8d1d9e367e37d40fd0456c03bb214e6e22b924fd5e981fdb3d2c40a47ceb2f08ac7abe8e9fa55fc7495412e941914656fccee1d3795f21ef0f93d9510  patch-6.13.2.patch.xz
 "

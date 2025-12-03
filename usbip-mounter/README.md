@@ -1,4 +1,4 @@
-# Home Assistant Add-on: USBIP Mounter Patched
+# Home Assistant Add-on: USBIP Mounter
 
 USBIP client addon to manage mounting usbip devices to home assistant
 
