@@ -25,7 +25,7 @@ FROM ${BUILD_FROM} AS final
 # Setup base
 ARG BUILD_ARCH=amd64
 
-COPY --from=build-stage /root/packages/x86_64/linux-tools-usbip-6.18.0-r0.apk /tmp/linux-tools-usbip-6.18.0-r0.apk
+COPY --from=build-stage /root/packages/x86_64/linux-tools-usbip-6.15.0-r0.apk /tmp/linux-tools-usbip-6.15.0-r0.apk
 
 # hadolint ignore=DL3003,DL3042
 RUN apk add --no-cache \
@@ -35,7 +35,7 @@ RUN apk add --no-cache \
     device-mapper-libs \
     grep
     
-RUN apk add --no-cache --allow-untrusted /tmp/linux-tools-usbip-6.18.0-r0.apk
+RUN apk add --no-cache --allow-untrusted /tmp/linux-tools-usbip-6.15.0-r0.apk
 
 # Copy root filesystem
 COPY rootfs /

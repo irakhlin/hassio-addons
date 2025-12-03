@@ -1,10 +1,8 @@
 # Contributor: Leo <thinkabit.ukim@gmail.com>
 # Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
-# Contributor: Milan P. Stanić <mps@arvanta.net>
-maintainer="Achill Gilgenast <achill@achill.org>"
+# Maintainer: Milan P. Stanić <mps@arvanta.net>
 pkgname=linux-tools
-pkgver=6.18.0
-# NOTE: Follows Greg's stable Linux releases, see kernel.org
+pkgver=6.15.0
 _kernver=${pkgver%.*}
 pkgrel=0
 pkgdesc="Linux kernel tools meta package"
@@ -13,7 +11,7 @@ arch="all"
 license="GPL-2.0-only"
 depends="perf cpupower $pkgname-gpio $pkgname-iio"
 depends_dev="pciutils-dev readline-dev gettext-dev"
-_llvmver=21
+_llvmver=20
 makedepends="
 	$depends_dev
 	asciidoc
@@ -53,7 +51,6 @@ subpackages="
 	perf-bash-completion:perf_bashcomp:noarch
 	cpupower
 	cpupower-openrc:cpupower_openrc
-	cpupower-systemd:cpupower_systemd
 	cpupower-bash-completion:cpupower_bashcomp:noarch
 	$pkgname-dev
 	$pkgname-gpio
@@ -110,7 +107,6 @@ _make_tools() {
 }
 
 build() {
-	export PATH="$PATH:/usr/lib/llvm$_llvmver/bin"
 	_make_tools perf cpupower gpio iio spi tmon bpf/bpftool
 	(
 		cd tools/usb/usbip
@@ -165,7 +161,6 @@ cpupower() {
 	amove \
 		usr/bin/cpu* \
 		usr/sbin/cpu* \
-		usr/libexec/cpu* \
 		usr/lib/libcpu*.so.* \
 		etc/cpu*
 
@@ -184,14 +179,6 @@ cpupower_openrc() {
 	amove \
 		etc/init.d/cpupower \
 		etc/conf.d/cpupower
-}
-
-cpupower_systemd() {
-	pkgdesc="Linux kernel tool to set CPU power features (systemd files)"
-	depends=""
-	install_if="cpupower=$pkgver-r$pkgrel systemd"
-
-	amove usr/lib/systemd/system/cpupower.service
 }
 
 cpupower_bashcomp() {
@@ -295,7 +282,7 @@ doc() {
 }
 
 sha512sums="
-88599ffdec96d150c1feb9b261ba93bb0301a9d0e1ad6bef7aeab1f5372cbfc57d8b43c7e902bd8f76921d1dbd8189663c142ea869e51d0e2b483b150ee00fe0  linux-6.18.tar.xz
+d03788ffa8d8ae1b84ef1286bb44a08fc01432e509dfec6cccae5c5a5a47201d378aec2bcd21e6f0bbd1e625b26f47780c06ee9c1cef3775358f98b160923f30  linux-6.15.tar.xz
 a46e3a84b00a39a356618831d0ddfb7f0d10f0a3799d1307ba2cc832e73c01f8d637a4e801a6dd25025f6f13155c6ad8b836422ff72d365e51063ac0bf907f52  cpupower-libs.patch
 0657b461659e79c1926379aab30e7b7ab2d59eaf3e686f1dce468b79eb1320c188c14a0507361660abd2553bccffa9e149fa5b6e4d770d10c99bf5dafd2e05ee  dt_lnk.patch
 2092b96d64e6c379ae52700b3c1bf459581afea69622a296821381e74ecafa4a08cea24eab002ad2152878a4508918de7807ac98ba72faf2d4dea18cc275933f  perf-doc.patch
