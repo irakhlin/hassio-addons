@@ -1,0 +1,36 @@
+---
+version: 2.1.1
+slug: piper
+name: Piper
+description: Text-to-speech with Piper
+url: https://github.com/home-assistant/addons/blob/master/piper
+arch:
+  - amd64
+  - aarch64
+init: false
+discovery:
+  - wyoming
+backup_exclude:
+  - "*.onnx"
+map:
+  - share
+options:
+  voice: en_US-lessac-medium
+  speaker: 0
+  length_scale: 1.0
+  noise_scale: 0.667
+  noise_w: 0.333
+  debug_logging: false
+  update_voices: true
+schema:
+  voice: str
+  speaker: int
+  length_scale: float
+  noise_scale: float
+  noise_w: float
+  debug_logging: bool
+  update_voices: bool
+ports:
+  "10200/tcp": null
+homeassistant: 2023.8.0.dev20230718
+image: homeassistant/{arch}-addon-piper
