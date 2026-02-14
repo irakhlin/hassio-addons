@@ -2,6 +2,7 @@ name: USBIP Mounter Patched
 slug: usbip-mounter-patched
 startup: services
 url: https://github.com/irakhlin/hassio-addons
+image: irakhlin/usbip-mounter-patched-addon-{arch}
 panel_icon: mdi:usb
 usbip: true
 usb: true

@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:19.0.0
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:20.0.1
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM} AS build-stage
 ARG BUILD_ARCH=amd64
@@ -20,7 +20,7 @@ RUN abuild -rfFkK && \
   mv /root/packages/aarch64 /root/packages/output || echo 'not found'
 
 
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:19.0.0
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:20.0.1
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM} AS final
 

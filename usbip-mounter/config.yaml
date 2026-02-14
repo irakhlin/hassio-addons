@@ -2,6 +2,7 @@ name: USBIP Mounter
 slug: usbip-mounter
 startup: services
 url: https://github.com/irakhlin/hassio-addons
+image: irakhlin/usbip-mounter-addon-{arch}
 panel_icon: mdi:usb
 usbip: true
 usb: true
