@@ -1,0 +1,11 @@
+configuration:
+  devices:
+    name: Devices
+    description: One entry per remote USB/IP device to attach and keep attached.
+    fields:
+      server_address:
+        name: Server Address
+        description: 'Syntax: IP.AD.RE.SS - the IPv4 address of the host running usbipd.'
+      bus_id:
+        name: Bus ID
+        description: 'Syntax: X-X.X - the busid of the device on the usbipd host, e.g. 1-1.4 (see `usbip list -l` on that host).'
