@@ -7,10 +7,8 @@
 # Wait for usbipd to become available
 s6-svwait -u -t 5000 /run/service/usbipd
 
-bashio::log.info "Attaching usbip devices"
+bashio::log.info "Attaching usbip devices and monitoring for disconnects"
 
-## Run the attach device script
-/usr/local/bin/mount_devices
-
-## Dont rerun this service after initial attach
-exec tail -f /dev/null
+## mount_devices now attaches once and then loops forever, re-attaching any
+## device that drops off - exec it directly so s6 supervises the loop itself
+exec /usr/local/bin/mount_devices
