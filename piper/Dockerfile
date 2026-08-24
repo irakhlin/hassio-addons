@@ -7,25 +7,27 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install Piper
 WORKDIR /usr/src
 ARG BUILD_ARCH
-ARG WYOMING_PIPER_VERSION=2.1.1
-ENV PIP_BREAK_SYSTEM_PACKAGES=1
+ARG WYOMING_PIPER_VERSION=2.3.1
 RUN \
     apt-get update \
     && apt-get install -y --no-install-recommends \
         netcat-traditional \
         python3 \
         python3-pip \
+        python3-venv \
     \
-    && pip3 install --no-cache-dir -U \
+    && python3 -m venv .venv \
+    && .venv/bin/pip3 install --no-cache-dir -U \
         setuptools \
         wheel \
-    && pip3 install --no-cache-dir \
+    && .venv/bin/pip3 install --no-cache-dir \
         --extra-index-url https://www.piwheels.org/simple \
-        "wyoming[zeroconf]>=1.8,<2" \
-        "wyoming-piper @ https://github.com/rhasspy/wyoming-piper/archive/refs/tags/v${WYOMING_PIPER_VERSION}.tar.gz" \
+        --extra-index-url https://download.pytorch.org/whl/cpu \
+        "wyoming-piper[zeroconf,zh] @ https://github.com/rhasspy/wyoming-piper/archive/refs/tags/v${WYOMING_PIPER_VERSION}.tar.gz" \
     \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PATH="/usr/src/.venv/bin:$PATH"
 WORKDIR /
 COPY rootfs /
 
