@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/home-assistant/base-debian:trixie
 FROM ${BUILD_FROM}
 
 # Set shell
@@ -7,7 +7,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install Piper
 WORKDIR /usr/src
 ARG BUILD_ARCH
-ARG WYOMING_PIPER_VERSION
+ARG WYOMING_PIPER_VERSION=2.1.1
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 RUN \
     apt-get update \
