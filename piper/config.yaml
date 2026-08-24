@@ -1,5 +1,5 @@
 ---
-version: 2.1.1
+version: 2.3.1
 slug: piper
 name: Piper
 description: Text-to-speech with Piper
@@ -20,6 +20,7 @@ options:
   length_scale: 1.0
   noise_scale: 0.667
   noise_w: 0.333
+  sentence_silence: 0.0
   debug_logging: false
   update_voices: true
 schema:
@@ -28,6 +29,7 @@ schema:
   length_scale: float
   noise_scale: float
   noise_w: float
+  sentence_silence: float
   debug_logging: bool
   update_voices: bool
 ports:
