@@ -1,4 +1,4 @@
-name: Builder
+name: "Builder"
 
 env:
   MONITORED_FILES: "config.json config.yaml config.yml Dockerfile rootfs"
