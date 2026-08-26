@@ -47,18 +47,51 @@ if ! bashio::fs.file_exists "${mount_script}"; then
   # restart, which also unnecessarily detached every OTHER device it manages
   # (e.g. this would have knocked a working Bluetooth adapter offline just to
   # recover an unrelated dropped Z-Wave stick).
+  #
+  # Per-device exponential backoff on the attach attempt itself (added after
+  # observing a real outage in production): during a real outage the
+  # server/network side stays down for a while, and hammering `usbip attach`
+  # again every single 15s compounds an already unstable connection instead
+  # of giving it room to recover. The `usbip port` status check stays on the
+  # full 15s cadence regardless (cheap, non-disruptive, and needed to
+  # promptly notice a fresh drop on any device) - only the disruptive attach
+  # command backs off, and only for the specific device that's failing;
+  # other devices keep their own independent cadence. Backoff resets to the
+  # base interval the moment a device is seen attached again.
   cat <<'MOUNT_LOOP' >> "${mount_script}"
 
 CHECK_INTERVAL_SECS=15
+MAX_BACKOFF_SECS=300
+
+declare -a FAIL_COUNT
+declare -a NEXT_ATTEMPT
 
 while true; do
+  now=$(date +%s)
   for i in "${!BUSIDS[@]}"; do
     server="${SERVERS[$i]}"
     busid="${BUSIDS[$i]}"
-    if ! usbip port 2>/dev/null | grep -q "usbip://${server}:3240/${busid}"; then
-      bashio::log.warning "Device ${busid} on ${server} is not attached - (re)attaching"
-      /usr/sbin/usbip --debug attach -r "${server}" -b "${busid}"
+
+    if usbip port 2>/dev/null | grep -q "usbip://${server}:3240/${busid}"; then
+      FAIL_COUNT[$i]=0
+      continue
     fi
+
+    if [ "${NEXT_ATTEMPT[$i]:-0}" -gt "${now}" ]; then
+      continue
+    fi
+
+    fails=${FAIL_COUNT[$i]:-0}
+    backoff=$(( CHECK_INTERVAL_SECS * (2 ** fails) ))
+    if [ "${backoff}" -gt "${MAX_BACKOFF_SECS}" ]; then
+      backoff=${MAX_BACKOFF_SECS}
+    fi
+
+    bashio::log.warning "Device ${busid} on ${server} is not attached - (re)attaching (attempt $((fails + 1)); if this fails too, next retry backs off ${backoff}s)"
+    /usr/sbin/usbip --debug attach -r "${server}" -b "${busid}"
+
+    FAIL_COUNT[$i]=$((fails + 1))
+    NEXT_ATTEMPT[$i]=$((now + backoff))
   done
   sleep "${CHECK_INTERVAL_SECS}"
 done
