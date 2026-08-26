@@ -25,3 +25,14 @@
 - Add field names/descriptions for the `devices` config (Server Address:
   IP.AD.RE.SS syntax, Bus ID: X-X.X syntax) so they show up in the add-on's
   Configuration UI instead of just raw schema.
+
+## 1.5.5
+
+- Add per-device exponential backoff (15s, 30s, 60s, ... capped at 300s) on
+  the re-attach attempt itself when a device is found not attached. During a
+  real outage the previous 1.5.3 loop retried every single 15s indefinitely,
+  compounding an already-unstable connection instead of giving it room to
+  recover. The `usbip port` status check still runs every 15s regardless
+  (cheap, needed to promptly notice a fresh drop) - only the disruptive
+  attach command backs off, per-device, and resets to the base interval the
+  moment that device is seen attached again.
